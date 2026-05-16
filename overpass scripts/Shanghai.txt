@@ -1,0 +1,18 @@
+[out:json][timeout:120];
+
+area["name"="上海市"]->.shanghai;
+
+(
+  
+  nwr["amenity"="hospital"](area.shanghai);
+  
+  
+  nwr["amenity"="clinic"](area.shanghai);
+  
+  
+  nwr["amenity"="doctors"](area.shanghai);
+);
+
+out body;
+>;
+out skel qt;
