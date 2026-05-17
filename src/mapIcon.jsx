@@ -22,9 +22,9 @@ export const clinicIcon = L.divIcon({
 
     ),
     className: 'custom-leaflet-icon',
-    iconSize: [40, 40],
-    iconAnchor: [20, 20],
-    popupAnchor: [0, -20]
+    iconSize: [20, 20],
+    iconAnchor: [10, 10],
+    popupAnchor: [0, -10]
 })
 
 export const doctorsIcon = L.divIcon({
@@ -35,7 +35,7 @@ export const doctorsIcon = L.divIcon({
 
     ),
     className: 'custom-leaflet-icon',
-    iconSize: [40, 40],
-    iconAnchor: [20, 20],
-    popupAnchor: [0, -20]
+    iconSize: [20, 20],
+    iconAnchor: [10, 10],
+    popupAnchor: [0, -10]
 })

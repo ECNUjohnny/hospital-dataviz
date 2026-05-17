@@ -1,0 +1,14 @@
+[out:json][timeout:50];
+// 锁定东京的行政边界
+area["name:en"="Tokyo"]["admin_level"="4"]->.searchArea;
+
+(
+  
+  node["amenity"~"hospital|clinic|doctors"](area.searchArea);
+  way["amenity"~"hospital|clinic|doctors"](area.searchArea);
+  relation["amenity"~"hospital|clinic|doctors"](area.searchArea);
+);
+
+out body;
+>;
+out skel qt;

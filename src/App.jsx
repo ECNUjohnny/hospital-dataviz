@@ -3,19 +3,29 @@ import { MapContainer, TileLayer, useMap, GeoJSON, Marker, Popup } from 'react-l
 import 'leaflet/dist/leaflet.css';
 import './App.css';
 import L, { latLng } from 'leaflet';
+import Microlink from '@microlink/react';
 
-import {hospitalIcon, clinicIcon, doctorsIcon} from './mapIcon'
+import { hospitalIcon, clinicIcon, doctorsIcon } from './mapIcon';
 import { MapIcon } from 'lucide-react';
+import { useCityData } from './useCityData';
+import { onEachFeature, pointToLayer } from './OnEachFeature';
+import { HeatmapLayer } from './HeatmapLayer';
 
 const CITY_CONFIGS = {
-  tokyo: { center: [35.6895, 139.6917], bounds: [[35.50, 139.50], [35.85, 140.00]] },
-  shanghai: { center: [31.2304, 121.4737], bounds: [[30.90, 121.10], [31.50, 121.80]] }
+  tokyo: { center: [35.6895, 139.6917], bounds: [[35.00, 139.20], [36.00, 140.50]] },
+  shanghai: { center: [31.2304, 121.4737], bounds: [[30.20, 120.50], [31.90, 122.30]] }
 };
 
 function ChangeView({ config }) {
   const map = useMap();
-  map.setView(config.center, 12);
-  map.setMaxBounds(config.bounds);
+  
+  useEffect(() => {
+    if (config) {
+      map.setView(config.center, 12);
+      map.setMaxBounds(config.bounds);
+    }
+  }, [config]);
+
   return null;
 }
 
@@ -23,49 +33,9 @@ function App() {
 
   const [activeCity, setActiveCity] = useState('shanghai');
 
-  const [geoDat, setgeoDat] = useState(null);
+  const {geoData, polygonCenters} = useCityData(activeCity);
 
-  const [polygonCenters, setPolygonCenters] = useState([]);
-
-  useEffect(() => {
-    fetch('/Shanghai.geojson')
-      .then(response => response.json())
-        .then(data => {
-          console.log("Successfully get the data!", data);
-          setgeoDat(data);
-
-          const centers = [];
-          data.features.forEach((feature, index) => {
-            
-            let geoType = feature.geometry.type;
-            
-            if (geoType = "Polygon" || geoType == "multipolygon") {
-              const tempLayer = L.geoJSON(feature);
-              const center = tempLayer.getBounds().getCenter();
-
-              centers.push({
-                id: feature.id || `poly-${index}`,
-                position: [center.lat, center.lng],
-                type: feature.properties.amenity,
-                name: feature.properties.name || "未知医疗机构"
-              })
-            }
-          
-            setPolygonCenters(centers);
-              
-          })
-
-        })
-        .catch(error => console.error("Failed to get the data", error));
-  }, []);
-
-  const pointToLayer = (feature, latlng) => {
-    const type = feature.properties.amenity;
-
-    if (type == 'hospital') return L.marker(latlng, {icon: hospitalIcon});
-    else if (type == 'clinic') return L.marker(latlng, {icon: clinicIcon});
-    else return L.marker(latlng, {icon: doctorsIcon})
-  }
+  const [showHeatmap, setShowHeatmap] = useState(false);
   
   return (
     // 最外层容器
@@ -108,9 +78,18 @@ function App() {
           }}>🏬 Shanghai</button>
         </div>
         
-        {/* 这里以后可以放更多的控件，比如：显示热力图开关、医院等级筛选等 */}
-        <div style={{ marginTop: 'auto', fontSize: '12px', color: '#64748b', textAlign: 'center' }}>
-          
+        {/* 更多控制选项 */}
+        <div style={{ marginTop: '20px', fontSize: '12px', color: '#64748b'}}>
+          <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#cbd5e1', textTransform: 'uppercase', letterSpacing: '1px' }}>panel</p>
+        
+          <button onClick = {() => setShowHeatmap(!showHeatmap)} style = {{
+            padding: '12px', borderRadius: '8px', border: '1px solid', cursor: 'pointer', fontWeight: 'bold', transition: 'all 0.2s',
+            backgroundColor: showHeatmap ? '#ef4444' : 'transparent', 
+            borderColor: showHeatmap ? '#ef4444' : '#334155',
+            color: 'white'
+          }}>
+            Open the Heatmap
+          </button>
         </div>
       </div>
 
@@ -138,16 +117,23 @@ function App() {
               url="https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png"
             />
 
-            {geoDat && activeCity === 'shanghai' && (
+            {geoData && (
               <>
+
+              {showHeatmap && <HeatmapLayer points={polygonCenters} />}
+
               <GeoJSON 
-                data = {geoDat} 
+                data = {geoData} 
+                key = {`${activeCity}-${geoData.features.length}`}
                 pointToLayer = {pointToLayer}
                 // style = {getPolygonStyle}
-                // onEachFeature = {onEachFeature}
+                onEachFeature = {onEachFeature}
               />
               
               {polygonCenters.map(marker => {
+                
+                if (marker.isPoint) return null;
+                 
                 let currentIcon = doctorsIcon;
                 if (marker.type === 'hospital') currentIcon = hospitalIcon;
                 else if (marker.type === 'clinic') currentIcon = clinicIcon;
@@ -158,7 +144,43 @@ function App() {
                     position = {marker.position}
                     icon = {currentIcon}
                   >
+                    <Popup>
+                      <div style={{ minWidth: '180px', fontFamily: 'sans-serif' }}>
+                        <h3 style={{ margin: '0 0 8px 0', color: '#3b82f6', fontSize: '16px', borderBottom: '1px solid #cbd5e1', paddingBottom: '6px' }}>
+                          {marker.name}
+                        </h3>
+                        
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <p style={{ margin: 0, fontSize: '13px', color: '#1e293b' }}>
+                            <b>type: </b>{marker.type === 'hospital' ? '🏥 hospital' : '🩺 clinic'}
+                          </p>
+                          <p style={{ margin: 0, fontSize: '12px', color: '#475569' }}>
+                            📍 {marker.street}
+                          </p>
+                          <p style={{ margin: 0, fontSize: '12px', color: '#475569' }}>
+                            🚪 {marker.housenumber} number
+                          </p>
+                          <p style={{ margin: 0, fontSize: '12px', color: '#475569' }}>
+                            📭 {marker.postcode} 
+                          </p>
+                          <p style={{ margin: 0, fontSize: '12px', color: '#475569' }}>
+                            🌐 {marker.website}
+                          </p>
+        
+                        </div>
+                        
+                        {marker.website !== "no web available" && (
+                          <div style={{ marginTop: '10px' }}>
+                            <Microlink 
+                              url={marker.website} 
+                              size="large" // 卡片大小
+                              style={{ width: '100%', borderRadius: '8px' }}
+                            />
+                          </div>
+                        )}
 
+                      </div>
+                    </Popup>
                   </Marker>
                 )
               })}
@@ -173,7 +195,7 @@ function App() {
           </div>
         </div>
 
-        {/* 区域 2：图表展示区 (下方数据面板) */}
+        {/* 区域 2：图表展示区 */}
         <div style={{ 
           padding: '20px', 
           backgroundColor: '#070b14',
