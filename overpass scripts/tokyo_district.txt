@@ -1,0 +1,12 @@
+[out:json][timeout:50];
+
+// 锁定省级东京
+area["name:en"="Tokyo"]["admin_level"="4"]->.searchArea;
+
+(
+  // 抓取特别区和市 (admin_level=7)
+  relation["boundary"="administrative"]["admin_level"="7"](area.searchArea);
+);
+
+
+out geom;

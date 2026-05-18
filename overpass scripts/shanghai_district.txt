@@ -1,0 +1,10 @@
+[out:json][timeout:50];
+
+// 严格限制必须是省级（admin_level=4）的上海市，防止匹配到同名街道
+area["name"="上海市"]["admin_level"="4"]->.searchArea;
+
+(
+  relation["boundary"="administrative"]["admin_level"~"5|6"](area.searchArea);
+);
+
+out geom;
