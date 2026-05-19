@@ -16,6 +16,8 @@ export const useCityData = (cityName) => {
 
     const [district, setDistrict] = useState(null);
 
+    const [road, setRoad] = useState(null);
+
     // console.log(cityName);
 
     useEffect(() => {
@@ -26,6 +28,8 @@ export const useCityData = (cityName) => {
 
         const url_district = `/${cityName}_district.geojson`;
 
+        const url_road = `/${cityName}_road.geojson`;
+
         // fetch(url_district).then(response => response.json()).then(data => {setDistrict(data)});
 
         // console.log(district.feature);
@@ -35,11 +39,14 @@ export const useCityData = (cityName) => {
 
         Promise.all([
             fetch(url).then(res => res.json()),
-            fetch(url_district).then(res => res.json())
+            fetch(url_district).then(res => res.json()),
+            fetch(url_road).then(res => res.json())
         ])
-          .then(([data, districtData]) => {
+          .then(([data, districtData, roadData]) => {
             setGeoData(data);
             setDistrict(districtData);
+            setRoad(roadData);
+            
 
             console.log(districtData.features.length);
 
@@ -121,11 +128,13 @@ export const useCityData = (cityName) => {
             });
 
             setPolygonCenters(centers);
+
+            // console.log(centers);
           })
             .catch(error => console.error(`Failed to get the data for ${cityName}`, error));
     }, [cityName]);
       
-    return { geoData, polygonCenters };
+    return { geoData, polygonCenters, districtData: district };
       
        
 }

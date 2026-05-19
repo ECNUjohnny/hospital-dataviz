@@ -4,38 +4,29 @@ import 'leaflet/dist/leaflet.css';
 import './App.css';
 import L, { latLng } from 'leaflet';
 import Microlink from '@microlink/react';
+import { DistrictChart } from './DistrictChart';
 
 import { hospitalIcon, clinicIcon, doctorsIcon } from './mapIcon';
 import { MapIcon } from 'lucide-react';
 import { useCityData } from './useCityData';
 import { onEachFeature, pointToLayer } from './OnEachFeature';
 import { HeatmapLayer } from './HeatmapLayer';
+import { ChangeView } from './ChangeView';
 
 const CITY_CONFIGS = {
   tokyo: { center: [35.6895, 139.6917], bounds: [[35.00, 139.20], [36.00, 140.50]] },
   shanghai: { center: [31.2304, 121.4737], bounds: [[30.20, 120.50], [31.90, 122.30]] }
 };
 
-function ChangeView({ config }) {
-  const map = useMap();
-  
-  useEffect(() => {
-    if (config) {
-      map.setView(config.center, 12);
-      map.setMaxBounds(config.bounds);
-    }
-  }, [config]);
-
-  return null;
-}
-
 function App() {
 
   const [activeCity, setActiveCity] = useState('shanghai');
 
-  const {geoData, polygonCenters} = useCityData(activeCity);
+  const {geoData, polygonCenters, districtData} = useCityData(activeCity);
 
   const [showHeatmap, setShowHeatmap] = useState(false);
+
+  const [showDistrict, setShowDistrict] = useState(false);
   
   return (
     // 最外层容器
@@ -89,6 +80,15 @@ function App() {
             color: 'white'
           }}>
             Open the Heatmap
+          </button >
+
+          <button onClick = {() => setShowDistrict(!showDistrict)} style = {{
+            padding: '12px', borderRadius: '8px', border: '1px solid', cursor: 'pointer', fontWeight: 'bold', transition: 'all 0.2s',
+            backgroundColor: showDistrict ? '#2c6adf' : 'transparent', 
+            borderColor: showDistrict ? '#342bdb' : '#334155',
+            color: 'white', textAlign: 'left', marginTop: '12px'
+          }}>
+            Show the district
           </button>
         </div>
       </div>
@@ -96,7 +96,7 @@ function App() {
       {/* 右侧：主展示区 (划分为上地图、下数据) */}
       <div style={{ 
         display: 'grid', 
-        gridTemplateRows: '80% 20%', 
+        gridTemplateRows: '60% 40%', 
         height: '100%' 
       }}>
         
@@ -104,6 +104,7 @@ function App() {
         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
           <MapContainer 
             center={CITY_CONFIGS[activeCity].center} 
+            preferCanvas={true}
             zoom={12} 
             minZoom={10} 
             maxBounds={CITY_CONFIGS[activeCity].bounds} 
@@ -121,6 +122,21 @@ function App() {
               <>
 
               {showHeatmap && <HeatmapLayer points={polygonCenters} />}
+
+              {showDistrict && districtData && (
+                <GeoJSON
+                  key={`district-boundary-${activeCity}`}
+                  data={districtData} 
+                  style={{
+                    color: '#3b82f6',       
+                    weight: 2,              
+                    opacity: 0.8,           
+                    fillColor: '#1e3a8a',   
+                    fillOpacity: 0.1,       
+                    dashArray: '5, 5'       
+                  }}
+                />
+              )}
 
               <GeoJSON 
                 data = {geoData} 
@@ -206,7 +222,7 @@ function App() {
         }}>
           {/* 左侧图表占位 */}
           <div style={{ backgroundColor: '#060b12', borderRadius: '12px', border: '1px solid #334155', padding: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ color: '#64748b' }}>📊 [图表位 1] 等待 ECharts 接入...</span>
+            <DistrictChart data={polygonCenters} cityName={activeCity}/>
           </div>
           
           {/* 右侧图表占位 */}
