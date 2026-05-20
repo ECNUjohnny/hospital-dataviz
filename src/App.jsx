@@ -5,6 +5,8 @@ import './App.css';
 import L, { latLng } from 'leaflet';
 import Microlink from '@microlink/react';
 import { DistrictChart } from './DistrictChart';
+import nearestPointOnLine from '@turf/nearest-point-on-line';
+import { point, featureCollection } from '@turf/helpers';
 
 import { hospitalIcon, clinicIcon, doctorsIcon } from './mapIcon';
 import { MapIcon } from 'lucide-react';
@@ -12,6 +14,7 @@ import { useCityData } from './useCityData';
 import { onEachFeature, pointToLayer } from './OnEachFeature';
 import { HeatmapLayer } from './HeatmapLayer';
 import { ChangeView } from './ChangeView';
+import { useRoute } from './useRoute';
 
 const CITY_CONFIGS = {
   tokyo: { center: [35.6895, 139.6917], bounds: [[35.00, 139.20], [36.00, 140.50]] },
@@ -22,11 +25,15 @@ function App() {
 
   const [activeCity, setActiveCity] = useState('shanghai');
 
-  const {geoData, polygonCenters, districtData} = useCityData(activeCity);
+  const {geoData, polygonCenters, districtData, road} = useCityData(activeCity);
 
   const [showHeatmap, setShowHeatmap] = useState(false);
 
   const [showDistrict, setShowDistrict] = useState(false);
+
+  const [showRoad, setShowRoad] = useState(false);
+
+  // const [activeRoute, setActiveRoute] = useState(null);
   
   return (
     // 最外层容器
@@ -90,6 +97,15 @@ function App() {
           }}>
             Show the district
           </button>
+
+          <button onClick = {() => setShowRoad(!showRoad)} style = {{
+            padding: '12px', borderRadius: '8px', border: '1px solid', cursor: 'pointer', fontWeight: 'bold', transition: 'all 0.2s',
+            backgroundColor: showRoad ? '#139297' : 'transparent', 
+            borderColor: showRoad ? '#1ca0a7' : '#334155',
+            color: 'white', textAlign: 'left', marginTop: '12px'
+          }}>
+            Show the road net
+          </button>
         </div>
       </div>
 
@@ -118,6 +134,17 @@ function App() {
               url="https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png"
             />
 
+            {showRoad && road && (
+              <GeoJSON
+                data = {road}
+                style = {{
+                  color: '#4f1cbc', 
+                  weight: 1.5,
+                  opacity: 0.6
+                }}
+              />
+            )}
+
             {geoData && (
               <>
 
@@ -138,15 +165,19 @@ function App() {
                 />
               )}
 
-              <GeoJSON 
+              {1 && (
+               <GeoJSON 
                 data = {geoData} 
                 key = {`${activeCity}-${geoData.features.length}`}
                 pointToLayer = {pointToLayer}
                 // style = {getPolygonStyle}
                 onEachFeature = {onEachFeature}
-              />
+              /> 
+              )}
               
               {polygonCenters.map(marker => {
+                
+                // if (showRoad) return null;
                 
                 if (marker.isPoint) return null;
                  

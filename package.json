@@ -12,9 +12,11 @@
   "dependencies": {
     "@babel/runtime": "^7.29.2",
     "@microlink/react": "^5.5.24",
+    "@turf/helpers": "^7.3.5",
+    "@turf/nearest-point-on-line": "^7.3.5",
     "@turf/turf": "^7.3.5",
     "echarts": "^6.0.0",
-    "echarts-for-react": "^2.0.11",
+    "geojson-path-finder": "^2.1.0",
     "leaflet": "^1.9.4",
     "leaflet.heat": "^0.2.0",
     "lucide-react": "^1.16.0",

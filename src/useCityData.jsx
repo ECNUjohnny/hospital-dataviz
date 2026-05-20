@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import L from 'leaflet';
 import * as turf from '@turf/turf';
+import { useState, useEffect } from 'react';
+import PathFinder from 'geojson-path-finder';
 
 /** 
 *
@@ -17,6 +19,8 @@ export const useCityData = (cityName) => {
     const [district, setDistrict] = useState(null);
 
     const [road, setRoad] = useState(null);
+
+    const [pathEngine, setPathEngine] = useState(null);
 
     // console.log(cityName);
 
@@ -43,10 +47,14 @@ export const useCityData = (cityName) => {
             fetch(url_road).then(res => res.json())
         ])
           .then(([data, districtData, roadData]) => {
+            
             setGeoData(data);
             setDistrict(districtData);
             setRoad(roadData);
             
+            const engine = new PathFinder(roadData, {precision: 1e-4});
+
+            setPathEngine(engine);
 
             console.log(districtData.features.length);
 
@@ -134,7 +142,7 @@ export const useCityData = (cityName) => {
             .catch(error => console.error(`Failed to get the data for ${cityName}`, error));
     }, [cityName]);
       
-    return { geoData, polygonCenters, districtData: district };
+    return { geoData, polygonCenters, districtData: district, road, pathEngine };
       
        
 }
