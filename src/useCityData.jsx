@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import L from 'leaflet';
 import * as turf from '@turf/turf';
-import { useState, useEffect } from 'react';
 import PathFinder from 'geojson-path-finder';
 
 /** 
@@ -18,10 +17,12 @@ export const useCityData = (cityName) => {
 
     const [district, setDistrict] = useState(null);
 
-    const [road, setRoad] = useState(null);
+    const [roadData, setRoadData] = useState(null);
 
     const [pathEngine, setPathEngine] = useState(null);
 
+    const [isBuilding, setIsBuilding] = useState(false);
+ 
     // console.log(cityName);
 
     useEffect(() => {
@@ -50,11 +51,33 @@ export const useCityData = (cityName) => {
             
             setGeoData(data);
             setDistrict(districtData);
-            setRoad(roadData);
+            setRoadData(roadData);
             
-            const engine = new PathFinder(roadData, {precision: 1e-4});
+            setIsBuilding(true);
 
-            setPathEngine(engine);
+            setTimeout(() => {
+
+                try 
+                {
+                    const engine = new PathFinder(roadData, {precision: 1e-4});
+                    setPathEngine(engine);
+                }
+                catch (e) 
+                {
+                    console.error("Something went wrong while initiating");
+
+
+                }
+                finally 
+                {
+                    setIsBuilding(false);
+                }
+
+            }, 150);
+
+            // const engine = new PathFinder(roadData, {precision: 1e-4});
+
+            // setPathEngine(engine);
 
             console.log(districtData.features.length);
 
@@ -142,7 +165,7 @@ export const useCityData = (cityName) => {
             .catch(error => console.error(`Failed to get the data for ${cityName}`, error));
     }, [cityName]);
       
-    return { geoData, polygonCenters, districtData: district, road, pathEngine };
+    return { geoData, polygonCenters, districtData: district, roadData, pathEngine, isBuilding };
       
        
 }

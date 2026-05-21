@@ -15,6 +15,7 @@ import { onEachFeature, pointToLayer } from './OnEachFeature';
 import { HeatmapLayer } from './HeatmapLayer';
 import { ChangeView } from './ChangeView';
 import { useRoute } from './useRoute';
+import { Loading } from './Loading';
 
 const CITY_CONFIGS = {
   tokyo: { center: [35.6895, 139.6917], bounds: [[35.00, 139.20], [36.00, 140.50]] },
@@ -25,7 +26,7 @@ function App() {
 
   const [activeCity, setActiveCity] = useState('shanghai');
 
-  const {geoData, polygonCenters, districtData, road} = useCityData(activeCity);
+  const { geoData, polygonCenters, districtData, roadData, pathEngine, isBuilding } = useCityData(activeCity);
 
   const [showHeatmap, setShowHeatmap] = useState(false);
 
@@ -33,7 +34,23 @@ function App() {
 
   const [showRoad, setShowRoad] = useState(false);
 
+  const [showPoints, setShowPoints] = useState(true);
+
+
   // const [activeRoute, setActiveRoute] = useState(null);
+
+  const { activeRoute, handleRouting } = useRoute(pathEngine, roadData);
+
+  // const tempData = handleRouting([121.4737, 31.2304], [121.45, 31.22]);
+
+  useEffect(() => {
+    
+    if (pathEngine && roadData) {
+
+      handleRouting([121.4737, 31.2304], [121.45, 31.22]);
+
+    }
+  }, [pathEngine, roadData]);
   
   return (
     // 最外层容器
@@ -106,6 +123,19 @@ function App() {
           }}>
             Show the road net
           </button>
+
+          <button onClick = {() => setShowPoints(!showPoints)} style = {{
+            padding: '12px', borderRadius: '8px', border: '1px solid', cursor: 'pointer', fontWeight: 'bold', transition: 'all 0.2s',
+            backgroundColor: showPoints ? '#6a0fac' : 'transparent', 
+            borderColor: showPoints ? '#591ca8' : '#334155',
+            color: 'white', textAlign: 'left', marginTop: '12px'
+          }}>
+            Show the points
+          </button>
+
+          <Loading 
+            isVisible = {isBuilding}
+          />
         </div>
       </div>
 
@@ -134,12 +164,25 @@ function App() {
               url="https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png"
             />
 
-            {showRoad && road && (
+            {showRoad && roadData && (
               <GeoJSON
-                data = {road}
+                data = {roadData}
                 style = {{
                   color: '#4f1cbc', 
                   weight: 1.5,
+                  opacity: 0.6
+                }}
+              />
+            )}
+
+            
+            {!showRoad && activeRoute && (
+              <GeoJSON
+                data = {activeRoute}
+                key = {`route-path-${JSON.stringify(activeRoute.geometry.coordinates[0])}`}
+                style = {{
+                  color: '#a6ce16', 
+                  weight: 4.0,
                   opacity: 0.6
                 }}
               />
@@ -158,14 +201,14 @@ function App() {
                     color: '#3b82f6',       
                     weight: 2,              
                     opacity: 0.8,           
-                    fillColor: '#1e3a8a',   
+                    fillColor: '#8a1e7d',   
                     fillOpacity: 0.1,       
                     dashArray: '5, 5'       
                   }}
                 />
               )}
 
-              {1 && (
+              {showPoints && (
                <GeoJSON 
                 data = {geoData} 
                 key = {`${activeCity}-${geoData.features.length}`}
@@ -175,7 +218,7 @@ function App() {
               /> 
               )}
               
-              {polygonCenters.map(marker => {
+              {showPoints && polygonCenters.map(marker => {
                 
                 // if (showRoad) return null;
                 

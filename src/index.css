@@ -5,3 +5,5 @@ html, body, #root {
   height: 100vh;
   overflow: hidden;
 }
+
+@keyframes spin { 100% { transform: rotate(360deg); } }

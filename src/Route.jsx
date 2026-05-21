@@ -1,5 +1,8 @@
 import nearestPointOnLine from '@turf/nearest-point-on-line';
 import { point, featureCollection } from '@turf/helpers';
+import explode from '@turf/explode';
+import nearestPoint from '@turf/nearest-point';
+
 
 /**
  * 
@@ -14,14 +17,17 @@ export const calculateRoute = (pathEngine, roadsData, startCoords, endCoords) =>
 
     if (!pathEngine || !roadsData) {
         
-        throw new error("Not ready");
+        throw new Error("not ready");
     }
 
     const startPt = point(startCoords);
     const targetPt = point(endCoords);
 
-    const snappedStart = nearestPointOnLine(roadsData, startPt);
-    const snappedEnd = nearestPointOnLine(roadsData, targetPt);
+    const allNodes = explode(roadsData);
+    
+
+    const snappedStart = nearestPoint(startPt, allNodes);
+    const snappedEnd = nearestPoint(targetPt, allNodes);
 
     const path = pathEngine.findPath(snappedStart, snappedEnd);
 
@@ -40,6 +46,6 @@ export const calculateRoute = (pathEngine, roadsData, startCoords, endCoords) =>
         };
     } 
     else {
-        throw new error("Cannot find a right route");
+        throw new Error("Cannot find a right route");
     }
 }
