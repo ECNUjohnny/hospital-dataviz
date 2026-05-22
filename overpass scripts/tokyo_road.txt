@@ -1,0 +1,21 @@
+/*
+  东京核心区主干道路网抓取脚本 (无 Link 版)
+  范围: 南纬35.00, 西经139.20, 北纬36.00, 东经140.50
+*/
+
+[out:json][timeout:900];
+
+// 定义边界框 (Bounding Box)，顺序为: 南, 西, 北, 东
+(
+  // 正则匹配: 只抓取 primary, secondary, tertiary，严格排除任何带有 _link 的后缀
+  way["highway"~"^(primary|secondary|tertiary)$"](35.00,139.20,36.00,140.50);
+);
+
+// 输出道路本体
+out body;
+
+// 递归抓取构成这些道路的所有节点 (坐标点)
+>;
+
+// 以最精简的格式输出，减小文件体积
+out skel qt;

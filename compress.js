@@ -1,7 +1,7 @@
 import fs from 'fs';
 
-const inputFile = './public/shanghai_road.geojson'; 
-const outputFile = './public/shanghai_road_min.geojson';
+const inputFile = './public/tokyo_road.geojson'; 
+const outputFile = './public/tokyo_road_min.geojson';
 
 console.log('开始读取文件...');
 const rawData = fs.readFileSync(inputFile, 'utf8');

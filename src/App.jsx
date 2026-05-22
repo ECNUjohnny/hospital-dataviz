@@ -225,7 +225,7 @@ function App() {
             )}
             
             {/**渲染最短路 */}
-            {activeRoute && activeRoute.geometry && (
+            {shortestPath && activeRoute && activeRoute.geometry && (
               <GeoJSON
                 key = {`route-${activeRoute.properties.weight}`}
                 data = {activeRoute}
