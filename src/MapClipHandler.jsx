@@ -1,7 +1,8 @@
+import { useState } from 'react';
 import { MapContainer, TileLayer, GeoJSON, Marker, Popup, useMapEvents } from 'react-leaflet';
 
 
-export const MapClipHandler = ({ onMapClick }) => {
+export const MapClickHandler = ({ onMapClick }) => {
 
     useMapEvents({
 
@@ -15,19 +16,19 @@ export const MapClipHandler = ({ onMapClick }) => {
 
 };
 
-export const handleMapClick = ({
-    setStartPt, 
+export const handleMapClick = ({ 
     startPt,
+    setStartPt,
+    endPt,
     setEndPt,
-    endPt,  
     coords, 
-    flag,
+    shortestPath,
     pathEngine,
     roadData,
     handleRouting
 }) => {
 
-    if (!flag) return;
+    if (!shortestPath) return;
 
     if (!roadData || !pathEngine) return;
 
@@ -40,7 +41,7 @@ export const handleMapClick = ({
     else if (startPt && !endPt) {
 
         setEndPt(coords);
-        handleRouting(startPt, endPt);
+        handleRouting(startPt, coords);
 
     }
 

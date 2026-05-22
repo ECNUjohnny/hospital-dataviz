@@ -16,6 +16,8 @@ import { HeatmapLayer } from './HeatmapLayer';
 import { ChangeView } from './ChangeView';
 import { useRoute } from './useRoute';
 import { Loading } from './Loading';
+import { Icon, districtIcon } from './Icon.jsx';
+import { MapClickHandler, handleMapClick } from './MapClipHandler';
 
 const CITY_CONFIGS = {
   tokyo: { center: [35.6895, 139.6917], bounds: [[35.00, 139.20], [36.00, 140.50]] },
@@ -38,6 +40,10 @@ function App() {
 
   const [shortestPath, setShortestPath] = useState(false);
 
+  const [startPt, setStartPt] = useState(null);
+
+  const [endPt, setEndPt] = useState(null);
+
 
   // const [activeRoute, setActiveRoute] = useState(null);
 
@@ -45,14 +51,14 @@ function App() {
 
   // const tempData = handleRouting([121.4737, 31.2304], [121.45, 31.22]);
 
-  useEffect(() => {
+  // useEffect(() => {
     
-    if (pathEngine && roadData) {
+    // if (pathEngine && roadData) {
 
-      handleRouting([121.4737, 31.2304], [121.45, 31.22]);
+      // handleRouting([121.4737, 31.2304], [121.45, 31.22]);
 
-    }
-  }, [pathEngine, roadData]);
+    // }
+  // }, [pathEngine, roadData]);
   
   return (
     // 最外层容器
@@ -169,6 +175,24 @@ function App() {
             zoomControl={false}
             style={{ height: '100%', width: '100%' }}
           >
+
+            {/*事件监听*/}
+            <MapClickHandler onMapClick = {(coords) => {
+              handleMapClick({
+                coords: coords,
+                startPt: startPt,
+                endPt: endPt,
+                setStartPt: setStartPt,
+                setEndPt: setEndPt,
+                pathEngine: pathEngine,
+                roadData: roadData,
+                handleRouting: handleRouting,
+                shortestPath: shortestPath
+              })
+            }}
+            
+            />
+
             <ChangeView config={CITY_CONFIGS[activeCity]} />
             <TileLayer
               attribution='&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>'
@@ -186,16 +210,32 @@ function App() {
               />
             )}
 
+            {/*渲染起点*/}
+            {shortestPath && startPt && (
+              <Marker position={[startPt[1], startPt[0]]} icon = {Icon}>
+                <Popup>Start</Popup>
+              </Marker>
+            )}
+
+            {/*渲染终点*/}
+            {shortestPath && endPt && (
+              <Marker position={[endPt[1], endPt[0]]} icon = {Icon}>
+                <Popup>End</Popup>
+              </Marker>
+            )}
             
-            {!showRoad && activeRoute && (
+            {/**渲染最短路 */}
+            {activeRoute && activeRoute.geometry && (
               <GeoJSON
+                key = {`route-${activeRoute.properties.weight}`}
                 data = {activeRoute}
-                key = {`route-path-${JSON.stringify(activeRoute.geometry.coordinates[0])}`}
                 style = {{
-                  color: '#09c20c', 
-                  weight: 4.0,
-                  opacity: 0.6
+                  color: '#10b981', 
+                  weight: 6,        
+                  opacity: 0.9,     
+                  dashArray: '8, 8'
                 }}
+              
               />
             )}
 
@@ -208,6 +248,11 @@ function App() {
                 <GeoJSON
                   key={`district-boundary-${activeCity}`}
                   data={districtData} 
+                  
+                  pointToLayer={(feature, latlng) => {
+                    return L.marker(latlng, {icon: districtIcon});
+                  }}
+
                   style={{
                     color: '#3b82f6',       
                     weight: 2,              
