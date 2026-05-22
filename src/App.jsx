@@ -36,6 +36,8 @@ function App() {
 
   const [showPoints, setShowPoints] = useState(true);
 
+  const [shortestPath, setShortestPath] = useState(false);
+
 
   // const [activeRoute, setActiveRoute] = useState(null);
 
@@ -133,6 +135,15 @@ function App() {
             Show the points
           </button>
 
+          <button onClick = {() => setShortestPath(!shortestPath)} style = {{
+            padding: '12px', borderRadius: '8px', border: '1px solid', cursor: 'pointer', fontWeight: 'bold', transition: 'all 0.2s',
+            backgroundColor: shortestPath ? '#c61515' : 'transparent', 
+            borderColor: shortestPath ? '#c61515' : '#334155',
+            color: 'white', textAlign: 'left', marginTop: '12px'
+          }}>
+            Calc shortest path
+          </button>
+
           <Loading 
             isVisible = {isBuilding}
           />
@@ -181,7 +192,7 @@ function App() {
                 data = {activeRoute}
                 key = {`route-path-${JSON.stringify(activeRoute.geometry.coordinates[0])}`}
                 style = {{
-                  color: '#a6ce16', 
+                  color: '#09c20c', 
                   weight: 4.0,
                   opacity: 0.6
                 }}

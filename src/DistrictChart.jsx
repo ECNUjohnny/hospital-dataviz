@@ -52,9 +52,9 @@ export const DistrictChart = ({ data, cityName }) => {
       legend: {
         data: ['Hospital 🏥', 'Clinic 🩺', 'doctors 💉'],
         textStyle: { color: '#94a3b8' },
-        top: 0, right: 0
+        top: '15%', right: 0
       },
-      grid: { left: '0%', right: '2%', bottom: '5%', top: '80px', containLabel: true },
+      grid: { left: '0%', right: '2%', bottom: '5%', top: '25%', containLabel: true },
       xAxis: {
         type: 'category',
         data: xAxisData,

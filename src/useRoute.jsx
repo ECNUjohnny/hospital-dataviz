@@ -5,7 +5,7 @@ export const useRoute = (pathEngine, roadsData) => {
 
     const [activeRoute, setActiveRoute] = useState(null);
 
-    const handleRouting = (st, en) => {
+    const handleRouting = (startCoords, endCoords) => {
 
         if (!pathEngine || !roadsData) {
             
@@ -16,7 +16,7 @@ export const useRoute = (pathEngine, roadsData) => {
 
         try {
 
-            const routeGeojson = calculateRoute(pathEngine, roadsData, st, en);
+            const routeGeojson = calculateRoute(pathEngine, roadsData, startCoords, endCoords);
 
             setActiveRoute(routeGeojson);
         }

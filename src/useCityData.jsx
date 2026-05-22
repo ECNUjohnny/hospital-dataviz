@@ -33,7 +33,7 @@ export const useCityData = (cityName) => {
 
         const url_district = `/${cityName}_district.geojson`;
 
-        const url_road = `/${cityName}_road.geojson`;
+        const url_road = `/${cityName}_road_min.geojson`;
 
         // fetch(url_district).then(response => response.json()).then(data => {setDistrict(data)});
 
