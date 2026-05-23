@@ -34,11 +34,11 @@ export const DistrictChart = ({ data, cityName }) => {
     const clinicData = sortedDistricts.map(d => d[1].clinic);
     const doctorsData = sortedDistricts.map(d => d[1].doctors);
 
-    // --- 这里放入你最新调好圆角的 Option 配置 ---
+  
     const option = {
       backgroundColor: 'transparent',
       title: {
-        text: `${cityName === 'shanghai' ? '上海' : '东京'} 各区医疗资源分布 (Top 12)`,
+        text: `${cityName} 各区医疗资源分布 (Top 12)`,
         textStyle: { color: '#e2e8f0', fontSize: 15, fontWeight: 'bold' },
         top: 0, left: 0
       },

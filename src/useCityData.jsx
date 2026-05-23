@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import L from 'leaflet';
 import * as turf from '@turf/turf';
 import PathFinder from 'geojson-path-finder';
+import { handleGeoData } from './handleGeoData';
 
 /** 
 *
@@ -9,25 +10,30 @@ import PathFinder from 'geojson-path-finder';
 *
 */
 
-export const useCityData = (cityName) => {
+export const useCityData = (
+    cityName,
+    geoData,
+    setGeoData,
+    district,
+    setDistrict,
+    polygonCenters,
+    setPolygonCenters,
+    roadData, 
+    setRoadData,
+    pathEngine, 
+    setPathEngine,
+    isBuilding, 
+    setIsBuilding
+
+) => {
     
-    const [geoData, setGeoData] = useState(null);
-    
-    const [polygonCenters, setPolygonCenters] = useState([]);
-
-    const [district, setDistrict] = useState(null);
-
-    const [roadData, setRoadData] = useState(null);
-
-    const [pathEngine, setPathEngine] = useState(null);
-
-    const [isBuilding, setIsBuilding] = useState(false);
- 
     // console.log(cityName);
 
     useEffect(() => {
         
         if (!cityName) return;
+
+        if (cityName.startsWith("custom")) return;
 
         const url = `/${cityName}.geojson`;
 
@@ -73,13 +79,13 @@ export const useCityData = (cityName) => {
                     setIsBuilding(false);
                 }
 
-            }, 150);
+            }, 100);
 
             // const engine = new PathFinder(roadData, {precision: 1e-4});
 
             // setPathEngine(engine);
 
-            console.log(districtData.features.length);
+            // console.log(districtData.features.length);
 
             console.log(data.features.length);
 
@@ -89,83 +95,24 @@ export const useCityData = (cityName) => {
 
             data.features.forEach((feature, index) => {
                 
-                if (!feature.geometry || !feature.geometry.coordinates) return;
-
-                const tempLayer = L.geoJSON(feature);
-
-                const geoType = feature.geometry.type;
-
-                let point;
+                handleGeoData(feature, index, centers, districtData);
                 
-                if (geoType === "Point") point = turf.point([feature.geometry.coordinates[0], feature.geometry.coordinates[1]]);
-
-                else if (geoType === "Polygon" || geoType === 'MultiPolygon') {
-                    const center = tempLayer.getBounds().getCenter();
-                    point = turf.point([center.lng, center.lat]);
-                }
-
-                if (!point) return;
-
-                let district_name = "unknown district";
-
-                if (districtData && districtData.features) {
-                    const matchZone = districtData.features.find(districtFeature => {
-            
-                        return turf.booleanPointInPolygon(point, districtFeature);
-                    
-                    });
-
-                    if (matchZone) {
-            
-                        district_name = matchZone.properties["name:es"];
-                    }
-                }
-
-                if (geoType === 'Polygon' || geoType === 'MultiPolygon') {
-                    // const tempLayer = L.geoJSON(feature);
-
-                    const center = tempLayer.getBounds().getCenter();
-
-                    centers.push({
-                        id: feature.id || `poly-${index}`,
-                        isPoint: feature.geometry.type === 'Point',    
-                        position: [center.lat, center.lng],
-                        type: feature.properties.amenity,
-                        name: feature.properties.name || "unknown agency",
-                        district: district_name,
-
-                        housenumber: feature.properties["addr:housenumber"] ?? "unregistered",
-                        postcode: feature.properties["addr:postcode"] ?? "unregistered",
-                        street: feature.properties["addr:street"] ?? "unregistered",
-                        website: feature.properties["website"] ?? "no web available"
-                    })
-                }
-                else if (geoType === 'Point')
-                {
-                    centers.push({
-                        id: feature.id || `point-${index}`,
-                        isPoint: feature.geometry.type === 'Point',
-                        position: [feature.geometry.coordinates[1], feature.geometry.coordinates[0]],
-                        type: feature.properties.amenity,
-                        name: feature.properties.name || "unknown agency",
-                        district: district_name,
-
-                        housenumber: feature.properties["addr:housenumber"] ?? "unregistered",
-                        postcode: feature.properties["addr:postcode"] ?? "unregistered",
-                        street: feature.properties["addr:street"] ?? "unregistered",
-                        website: feature.properties["website"] ?? "no web available"
-                    })
-                }
             });
 
             setPolygonCenters(centers);
 
-            // console.log(centers);
+            console.log(centers.length);
+
+            // let centers_point = [];
+
+            // centers_point = centers.filter((item) => item.isPoint === true);
+
+            // console.log(centers_point.length);
           })
             .catch(error => console.error(`Failed to get the data for ${cityName}`, error));
     }, [cityName]);
       
-    return { geoData, polygonCenters, districtData: district, roadData, pathEngine, isBuilding };
+    return;
       
        
 }

@@ -5,10 +5,17 @@ export const ChangeView = ({ config }) => {
   const map = useMap();
   
   useEffect(() => {
+    
     if (config) {
-      map.setView(config.center, 12);
-      map.setMaxBounds(config.bounds);
+
+      // console.log(config);
+
+      if (config.center) map.setView(config.center, 12);
+      
+      if (config.bounds) map.setMaxBounds(config.bounds);
+
     }
+
   }, [config]);
 
   return null;
