@@ -141,7 +141,7 @@ function App() {
         overflowY: 'auto'
       }}>
         <div>
-          <h1 style={{ fontSize: '24px', margin: '0 0 8px 0', color: '#f8fafc' }}>🏥Public Hygiene and Sanitary</h1>
+          <h1 style={{ fontSize: '24px', margin: '0 0 8px 0', color: '#f8fafc' }}>Public Hygiene and Sanitary</h1>
 
         </div>
 
@@ -462,7 +462,7 @@ function App() {
 
           {/* 右侧图表占位 */}
           <div style={{ backgroundColor: '#04070b', borderRadius: '12px', border: '1px solid #334155', padding: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ color: '#64748b' }}>📈 [图表位 2] 等待 ECharts 接入...</span>
+            <Chart data={finalPolygonCenters} cityName={custom ? currentCity.name : activeCity} />
           </div>
         </div>
 
