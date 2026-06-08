@@ -4,7 +4,7 @@ import * as echarts from 'echarts';
 export const DistrictChart = ({ data, cityName }) => {
  
   const chartRef = useRef(null);
-
+  
   
   useEffect(() => {
    

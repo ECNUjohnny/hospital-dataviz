@@ -20,6 +20,7 @@ import { MapClickHandler, handleMapClick } from './MapClipHandler';
 import { handleFile } from './handleFile.jsx';
 import { PanelButton } from './PanelButton.jsx';
 import { DistrictChart } from './DistrictChart';
+import { Chart } from './Chart.jsx';
 
 export let CITY_CONFIGS = {
   tokyo: { center: [35.6895, 139.6917], bounds: [[35.00, 139.20], [36.00, 140.50]] },
@@ -136,7 +137,8 @@ function App() {
         borderRight: '1px solid #030507',
         display: 'flex',
         flexDirection: 'column',
-        gap: '20px'
+        gap: '20px', 
+        overflowY: 'auto'
       }}>
         <div>
           <h1 style={{ fontSize: '24px', margin: '0 0 8px 0', color: '#f8fafc' }}>🏥Public Hygiene and Sanitary</h1>
@@ -252,13 +254,14 @@ function App() {
 
       {/* 右侧：主展示区 (划分为上地图、下数据) */}
       <div style={{
-        display: 'grid',
-        gridTemplateRows: '60% 40%',
-        height: '100%'
+        display: 'flex', 
+        flexDirection: 'column',  
+        height: '100%',
+        overflowY: 'auto'
       }}>
 
         {/* 区域 1：地图基座 */}
-        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+        <div style={{ position: 'relative', width: '100%', flex: '1 1 auto', minHeight: '400px' }}>
           <MapContainer
             key={activeCity}
             center={CITY_CONFIGS[activeCity].center}
@@ -449,7 +452,8 @@ function App() {
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
           gap: '20px',
-          overflowY: 'auto'
+          height: '350px',       
+          flexShrink: 0           
         }}>
           {/* 左侧图表占位 */}
           <div style={{ backgroundColor: '#060b12', borderRadius: '12px', border: '1px solid #334155', padding: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
