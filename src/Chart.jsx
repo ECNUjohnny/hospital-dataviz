@@ -31,6 +31,7 @@ export const Chart = ({ data, cityName }) => {
         const chartInstance = echarts.init(chartRef.current);
 
         const option = {
+            color: ['#ef4444', '#089e62', '#3b82f6'], 
             title: {
                 text: `${cityName} 医疗机构类型分布`,
                 textStyle: { color: '#e2e8f0', fontSize: 15, fontWeight: 'bold' },
@@ -50,10 +51,18 @@ export const Chart = ({ data, cityName }) => {
                 radius: '50%',
                 data: pieChartData,
                 center: ['50%', '50%'],
+                label: {
+                    color: '#e2e8f0',
+                    fontSize: 13,
+                    fontWeight: '500',
+                    
+                    textBorderWidth: 0, 
+                    textShadowBlur: 0,
+                },
                 emphasis: {
                     itemStyle: {
                         shadowBlur: 10,
-                        shadowOffestX: 0,
+                        shadowOffsetX: 0,
                         shadowColor: 'rgba(0, 0, 0, 0.5)',
                     }
                 }
