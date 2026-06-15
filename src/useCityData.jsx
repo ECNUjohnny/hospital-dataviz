@@ -35,11 +35,11 @@ export const useCityData = (
 
         if (cityName.startsWith("custom")) return;
 
-        const url = `/${cityName}.geojson`;
+        const url = `${import.meta.env.BASE_URL}${cityName}.geojson`;
 
-        const url_district = `/${cityName}_district.geojson`;
+        const url_district = `${import.meta.env.BASE_URL}${cityName}_district.geojson`;
 
-        const url_road = `/${cityName}_road_min.geojson`;
+        const url_road = `${import.meta.env.BASE_URL}${cityName}_road_min.geojson`;
 
         // fetch(url_district).then(response => response.json()).then(data => {setDistrict(data)});
 
