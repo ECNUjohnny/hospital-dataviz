@@ -272,16 +272,16 @@ function App() {
                             <b>type: </b>{marker.type === 'hospital' ? '🏥 hospital' : '🩺 clinic'}
                           </p>
                           <p style={{ margin: 0, fontSize: '12px', color: '#475569' }}>
-                            📍 {marker.street}
+                            {marker.street}
                           </p>
                           <p style={{ margin: 0, fontSize: '12px', color: '#475569' }}>
-                            🚪 {marker.housenumber} number
+                            {marker.housenumber} number
                           </p>
                           <p style={{ margin: 0, fontSize: '12px', color: '#475569' }}>
-                            📭 {marker.postcode}
+                            {marker.postcode}
                           </p>
                           <p style={{ margin: 0, fontSize: '12px', color: '#475569' }}>
-                            🌐 {marker.website}
+                            {marker.website}
                           </p>
 
                         </div>
